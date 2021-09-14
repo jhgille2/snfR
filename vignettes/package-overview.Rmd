@@ -1,0 +1,168 @@
+---
+title: "Package overview"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{package-overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+```{r setup}
+#library(snfR)
+library(DiagrammeR)
+```
+
+# Introduction
+
+Our soybean breeding program (and most others) is operated with a structure that gradually develops, evaluates, and applies various statistical analyses to a collection of soybean populations. While these populations are often developed for a wide variety of different objectives, the data collected from them tends to be managed in a similar way from year to year. This management involves various tasks including the creation of spreadsheets for data collection, merging spreadsheets that hold different data for the same populations, and the application of statistical techniques to summarize the performance of genotypes at the end of a growing season. In many cases, each of these steps are done by hand which can often become time consuming and potentially error prone. Working with the unit for the last few years has given me the chance to see this analysis cycle through a few times. As I worked, I gradually put together a very unorganized collection of helper scripts that I used to somewhat automate the more tedious stages of the data management cycle than came up each year. My goal for this package is to create a much more organized and unified collection of functions to help with different data analysis and processing tasks that are common to the cycle of our breeding program. My hope is that the package will provide a workflow that both closely matches the existing workflow that we are all familiar with, but also provide us with a way to both more efficiently and more reliably accomplish the tasks in our program that lend themselves well to automation. 
+
+# The breeding program
+
+Most of the components of the data analysis pipeline of our program only make sense with a picture of the breeding program itself so I figured I'd start with a high-level overview of our breeding program.  
+
+
+```{r, echo = FALSE, fig.height=7.5, fig.width=7.5}
+grViz("
+digraph boxes_and_circles {
+
+  # a 'graph' statement
+  graph [overlap = true, fontsize = 10]
+
+  # several 'node' statements
+  node [shape = box,
+        fontname = Helvetica]
+  Parents; Crossing; F1; SSDs; 'Single Plants'; 'Plant Rows'; 'Yield Trial 1'; 'Yield Trial 2'; 'Yield Trial n'; 'Select best plant rows'; 'Select best yield lines'; 'Uniform trial'; Release
+
+  Parents -> Crossing -> F1 -> SSDs -> 'Single Plants' -> 'Plant Rows' -> 'Select best plant rows' ->{'Yield Trial 1' 'Yield Trial 2' 'Yield Trial n'} -> 'Select best yield lines' -> 'Uniform trial' -> Release 
+
+}
+")
+
+
+```
+
+This is somewhat of a "snapshot" of what our program (and many other conventional breeding programs) looks like at any point in time. At each stage in this process we record at east some data from the soybeans that are involved in each stage. In the "early" stages of the process, this data is mainly bookkeeping adjacent, with files to keep track of what parents were used in each cross, or how many F1 progeny, or seeds available for SSDs we have in a given year. However, as we progress down the char we begin to collect more data, and the amount and diversity of data collected at each step increases as well. The ultimate goal of our program is to identify soybean lines that excel in a given trait (or traits) from among the many lines that exist in the middle stages of our program, and as such these next steps involve not just the collection of more data, but the application of various statistical methods that we use to summarize the collected data and help to identify what subset of lines should be advanced to the next stage. As you'd expect, this is the part of the program that typically involves the most work, both in terms of physical labor, and the effort dedicated to managing the data involved. The goal of this package is to help with the data management part, so next I want to turn to another view of this flowchart, in terms of the data involved in each step. 
+
+## Our filesystem
+
+```{r DataFlowchart, echo = FALSE, fig.height=7.5, fig.width=7.5}
+grViz("
+digraph nicegraph {
+
+  compound=true;
+
+  # graph, node, and edge definitions
+  graph [compound = true, nodesep = .5, ranksep = .25,
+         color = crimson]
+
+  node [fontname = Helvetica, fontcolor = darkslategray,
+        shape = rectangle, fixedsize = true, width = 1,
+        color = darkslategray]
+
+  edge [color = grey, arrowhead = none, arrowtail = none]
+
+  # subgraph for cross parent files
+  subgraph cluster_parents {
+    node [fixedsize = true, width = 3]
+    'Crossing plan'
+    label = 'Parents'
+  }
+
+  # subgraph for crossing files
+  subgraph cluster_crossing {
+    node [fixedsize = true, width = 3]
+    'Success counts'
+    label = Crossing
+  }
+  
+  # subgraph for F1 files
+  subgraph cluster_F1 {
+    node [fixedsize = true, width = 3]
+    'F1 seed counts'
+    label = F1
+  }
+  
+  # subgraph for SSD files
+  subgraph cluster_ssd {
+    node [fixedsize = true, width = 3]
+    'SSD seed counts'
+    label = SSDs
+  }
+  
+  # subgraph for single plant files
+  subgraph cluster_singleplants {
+    node [fixedsize = true, width = 3]
+    'Single plant IDs'
+    label = 'Single Plants'
+  }
+  
+  # subgraph for yield trial files
+  subgraph cluster_yield {
+    node [fixedsize = true, width = 3]
+    
+    'Field notes - Yield Trial 1'
+    'Field notes - Yield Trial 2'
+    'Field notes - Yield Trial n'
+    
+    label = 'Yield Trials'
+  }
+  
+  # subgraph for plant row files
+  subgraph cluster_plantrows {
+    node [fixedsize = true, width = 3]
+    'Field notes - plant rows'
+    
+    label = 'Plant Rows'
+  }
+  
+  # subgraph for NIR files
+  subgraph cluster_NIR {
+  
+    node [fixedsize = true, width = 3]
+    
+    'Single plant NIR (1 obs per plant)'
+    'Plant row NIR (1 obs per row)'
+    'Yield trial NIR (1 obs per plot)'
+    
+    label = 'NIR output files'
+  }
+  
+  'Crossing plan' -> 'Success counts' [ltail = cluster_parents, lhead = cluster_crossing]
+  'Success counts' -> 'F1 seed counts' [ltail = cluster_crossing, lhead = cluster_F1]
+  'F1 seed counts' -> 'SSD seed counts' [ltail = cluster_F1, lhead = cluster_ssd]
+  
+  'Single plant IDs' -> 'NIR master file' [ltail = cluster_singleplants]
+  'Field notes - plant rows' -> 'NIR master file' [ltail = cluster_plantrows]
+  'Field notes - Yield Trial 1' -> 'NIR master file' [ltail = cluster_yield]
+  
+  node [fixedsize = FALSE, width = 25]
+  'NIR master file' -> 'Single plant NIR (1 obs per plant)' [lhead = cluster_NIR]
+  
+  node [fixedsize = FALSE, width = 3]
+  'Single plant NIR (1 obs per plant)' -> 'Merged single plant data' [ltail = cluster_NIR]
+  'Plant row NIR (1 obs per row)' -> 'Merged plant row data' [ltail = cluster_NIR]
+  'Yield trial NIR (1 obs per plot)' -> 'Merged yield data (1 file per trial)' [ltail = cluster_NIR]
+  
+  'Merged yield data (1 file per trial)' -> 'Yield LSMeans (1 file per trial)'
+  
+
+}
+
+")
+
+
+```
+
+This is the basic file structure that we use to store our data for each season. Many of the files are relatively straightforward. The data used to keep track of the crosses, F1s and SSDs are typically entered into one file for each group and kept for reference later on. Things get a bit more complicated with the single plants, yield trials, and plant row data though. For those stages we also collect seed composition data (protein and oil) from our NIR instrument. Eventually, this data has to be joined back to the field notes. To do this, a 'NIR master file" is created which is essentially a big lookup table that creates a unique code for each sample that can be used to join the NIR data back to the field data. 
+
+## Why a R package
+
+Some steps in maintining these files can get a bit tedious. The main culprit is with the yield files since in a given year we can have one file for each yield test, for each location. To process these files we have to merge all the yield files, clean up the output from the NIR machine, join the NIR data to the merged yield files, fit statistical models for each test, for several traits, and then produce output summary documents for each test. This can get a bit overwhelming, so another approach is to make a set of functions to do the jobs that have to be repeated, or are just easy for the computer to do. 
