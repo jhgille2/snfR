@@ -72,7 +72,7 @@ clean_lead_sheets <- function(files = NULL) {
 
       # Convert each column of the dataframes in the list to a character so they can be bound
       df_list <- df_list %>%
-        map(., function(x) x %>% mutate(across(everything(), as.character)))
+        purrr::map(., function(x) x %>% dplyr::mutate(across(everything(), as.character)))
 
 
       # Bind rows of the dataframes in the list, rename columns, remove
@@ -128,7 +128,8 @@ clean_lead_sheets <- function(files = NULL) {
       CleanData <- df %>%
         janitor::row_to_names(1) %>%
         janitor::clean_names() %>%
-        dplyr::rename(any_of(colname_lookup))
+        dplyr::rename(any_of(colname_lookup)) %>%
+        dplyr::mutate(across(everything(), as.character))
 
       return(CleanData)
     }
@@ -148,13 +149,43 @@ clean_lead_sheets <- function(files = NULL) {
   }
 
   # Get the names of the files without file extensions
-  leadsheet_names <- tools::file_path_sans_ext(basename(files))
+  leadsheet_names <- tools::file_path_sans_ext(basename(files)) %>%
+    stringr::str_remove(stringr::regex('lead sheet', ignore_case = T)) %>%
+    stringr::str_squish()
+
+  # A function to add the test name to each dataframe
+  add_test_name <- function(testdata, testname)
+  {
+    purrr::map(testdata, function(x) x %>% dplyr::mutate(test_name = testname))
+  }
 
   # Apply this cleaning function to all the files in the "files" argument of the main function
   All_clean_files <- purrr::map(files, clean_one_sheet) %>%
-    set_names(leadsheet_names)
+    set_names(leadsheet_names) %>%
+    map2(., names(.), add_test_name)
 
-  return(All_clean_files)
+  # A function to combine the three tables from each leadsheet into three compete tables to hold the data for the
+  # complete set of tests
+  pluck_and_merge <- function(testdata, element)
+  {
+    purrr::map(testdata, function(x) pluck(x, element)) %>%
+      purrr::reduce(dplyr::bind_rows)
+  }
+
+  # Merge the tables from each individual test
+  all_plot_techniques <- pluck_and_merge(All_clean_files, "Plot techniques")
+  all_data_to_collect <- pluck_and_merge(All_clean_files, "Data to collect")
+  all_genotype_tables <- pluck_and_merge(All_clean_files, "Genotypes")
+
+  # Make a list to hold the three big tables and then return everything in a final named list
+  overall_tables <- list("Plot techniques" = all_plot_techniques,
+                         "Data to collect" = all_data_to_collect,
+                         "Genotypes"       = all_genotype_tables)
+
+  res_final <- list("Merged tables"    = overall_tables,
+                    "Individual tests" = All_clean_files)
+
+  return(res_final)
 }
 
 
