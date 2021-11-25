@@ -4,7 +4,7 @@ library(dplyr)
 library(purrr)
 library(stringr)
 
-LeadSheet_df <- read_excel(path = here("sandbox", "data", "leadsheets", "2021 LU 5E-1 lead Sheet.xlsx"),
+LeadSheet_df <- readxl::read_excel(path = list.files(here("sandbox", "data", "leadsheets"), full.names = TRUE)[[7]],
                                 col_names = FALSE)
 
 # Seperate out the different info sources in the file
@@ -33,7 +33,7 @@ test_plot_techniques <- LeadSheet_df[7:12, 1:8]
 # test genotypes
 
 # Find start and end rows of table
-geno_startRow  <- map(LeadSheet_df[, 1], function(x) str_detect(x, "INITIALS OF PACKER:")) %>% unlist() %>% which()
+geno_startRow  <- map(LeadSheet_df[, 1], function(x) str_detect(x, "INITIALS")) %>% unlist() %>% which()
 geno_endRow    <- map(LeadSheet_df[, 1], function(x) str_detect(x, "Data to be Collected:")) %>% unlist() %>% which()
 test_genotypes <- LeadSheet_df[(geno_startRow + 1):(geno_endRow - 1), 1:8]
 
@@ -58,6 +58,9 @@ clean_plot_techniques <- function(df){
       stringr::str_replace("seed/plot", "seeds per plot") %>%
       stringr::str_squish()
   }
+
+  df_list <- df_list %>%
+    map(., function(x) x %>% mutate(across(everything(), as.character)))
 
   CleanData <- df_list %>%
     purrr::reduce(bind_rows) %>%
@@ -113,4 +116,8 @@ clean_genotype_table <- function(df){
   return(CleanData)
 }
 
+
+test_plot_techniques_table <- clean_plot_techniques(test_plot_techniques)
+test_data_collect_table    <- clean_data_collect(test_data_collect, test_plot_techniques_table)
+test_genotype_table        <- clean_genotype_table(test_genotypes)
 

@@ -9,6 +9,15 @@ clean_lead_sheets(files = NULL)
 \arguments{
 \item{files}{A vector of file paths to lead sheet excel files.}
 }
+\value{
+A named list of tibbles, one element for each leadsheet. The list names are taken from the file names of the leadsheets.
+Each list element is a list of three tibbles which hold data collected from each leadsheet:
+\itemize{
+\item \strong{Plot techniques:} Field techniques used for planting the test.
+\item \strong{Data to collect:} What phenotypes to measure and how many reps for each phenotype.
+\item \strong{Genotypes:} Code numbers and entry names for the genotypes included in the test along with other relevant identifying information for each genotype.
+}
+}
 \description{
-test test one, two three
+A function to read in and tidy data from lead sheets generated with the yield test excel macro.
 }

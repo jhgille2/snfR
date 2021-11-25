@@ -20,4 +20,5 @@ Imports:
     readxl,
     stringr,
     purrr,
-    janitor
+    janitor, 
+    tools
