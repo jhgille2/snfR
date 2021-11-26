@@ -4,7 +4,7 @@ library(dplyr)
 library(purrr)
 library(stringr)
 
-LeadSheet_df <- readxl::read_excel(path = list.files(here("sandbox", "data", "leadsheets"), full.names = TRUE)[[7]],
+LeadSheet_df <- readxl::read_excel(path = list.files(here("sandbox", "data", "leadsheets"), full.names = TRUE)[[1]],
                                 col_names = FALSE)
 
 # Seperate out the different info sources in the file
@@ -46,6 +46,16 @@ test_data_collect     <- LeadSheet_df[data_collect_startRow:data_collect_endRow,
 # Clean the plot techniques
 clean_plot_techniques <- function(df){
 
+  # Special handling for the location row to allow for multiple locations
+  loc_row <- df[1, ] %>% unlist()
+  df      <- df[-1, ]
+
+  locs <- loc_row[!is.na(loc_row)]
+  locs <- locs(2:length(locs))
+
+  # A tibble with just the locations
+  loc_df <- tibble(component = "Loc", value = locs)
+
   # Split the data into 2 column chunks
   df_list <- list(df[, 1:2], df[, 3:4], df[, 5:6], df[, 7:8])
 
@@ -66,7 +76,8 @@ clean_plot_techniques <- function(df){
     purrr::reduce(bind_rows) %>%
     purrr::set_names(c("component", "value")) %>%
     tidyr::drop_na() %>%
-    dplyr::mutate(component = map_chr(component, clean_components))
+    dplyr::mutate(component = map_chr(component, clean_components)) %>%
+    dplyr::bind_rows(loc_df)
 
   return(CleanData)
 }
@@ -116,6 +127,7 @@ clean_genotype_table <- function(df){
   return(CleanData)
 }
 
+clean_yield_files(files = NULL)
 
 test_plot_techniques_table <- clean_plot_techniques(test_plot_techniques)
 test_data_collect_table    <- clean_data_collect(test_data_collect, test_plot_techniques_table)
