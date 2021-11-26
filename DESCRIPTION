@@ -1,11 +1,14 @@
 Package: snfR
 Type: Package
-Title: What the Package Does (Title Case)
+Title: helper functions for data processing and analysis for the Mian soybean breeding group. 
 Version: 0.1.0
 Author: Jay Gillenwater
 Maintainer: jhgille2@ncsu.edu
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: This package is a collection of functions that are meant to help with common data processing
+and analysiss tasks that come up during our soybean breeding program. Most of the functions help with
+cleaning up data from the files we use for data entry and wrangling them into formats that make downstream analysis
+much easier. Beyone this, there are a couple functions for detecting common errors, some for visualization, 
+and some for routine analysis and reporting. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -20,7 +23,13 @@ Imports:
     readxl,
     stringr,
     purrr,
+<<<<<<< HEAD
     janitor, 
     tools
 Depends: 
     R (>= 2.10)
+=======
+    janitor,
+    readr,
+    tidyselect
+>>>>>>> cc73c64d384539f50c216f2017222db15e5d31d6
