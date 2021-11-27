@@ -5,10 +5,10 @@ Version: 0.1.0
 Author: Jay Gillenwater
 Maintainer: jhgille2@ncsu.edu
 Description: This package is a collection of functions that are meant to help with common data processing
-and analysiss tasks that come up during our soybean breeding program. Most of the functions help with
-cleaning up data from the files we use for data entry and wrangling them into formats that make downstream analysis
-much easier. Beyone this, there are a couple functions for detecting common errors, some for visualization, 
-and some for routine analysis and reporting. 
+    and analysis tasks that come up during our soybean breeding program. Most of the functions help with
+    cleaning up data from the files we use for data entry and wrangling them into formats that make downstream analysis
+    much easier. Beyone this, there are a couple functions for detecting common errors, some for visualization, 
+    and some for routine analysis and reporting. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -19,17 +19,15 @@ VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 Imports: 
     tidyr,
-    dplyr,
     readxl,
     stringr,
     purrr,
-<<<<<<< HEAD
     janitor, 
     tools
 Depends: 
     R (>= 2.10)
-=======
     janitor,
     readr,
-    tidyselect
->>>>>>> cc73c64d384539f50c216f2017222db15e5d31d6
+    tidyselect, 
+    DataEditR, 
+    dplyr

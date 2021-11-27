@@ -29,8 +29,7 @@ clean_yield_files <- function(files = NULL) {
     return(names_cleaned)
   }
 
-
-
+  # A function to set the column types, here just for the character vs numeric columns in the vectors below
   set_yield_coltypes <- function(yieldfile)
   {
 
@@ -62,9 +61,9 @@ clean_yield_files <- function(files = NULL) {
   }
 
   # Read in each file, rename the columns, set column types, and merge all the files together
-  All_Yield_Dfs <- map(files, function(x) read_excel(x) %>%
-                         rename_yield_dfs(., yield_lookup) %>%
-                         set_yield_coltypes()) %>%
+  All_Yield_Dfs <- purrr::map(files, function(x) readxl::read_excel(x) %>%
+                                rename_yield_dfs(., yield_lookup) %>%
+                                set_yield_coltypes()) %>%
     purrr::reduce(dplyr::bind_rows)
 
   return(All_Yield_Dfs)

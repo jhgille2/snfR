@@ -85,13 +85,13 @@ clean_lead_sheets <- function(files = NULL) {
       }
 
       df_list <- df_list %>%
-        map(., function(x) x %>% mutate(across(everything(), as.character)))
+        purrr::map(., function(x) x %>% dplyr::mutate(across(everything(), as.character)))
 
       CleanData <- df_list %>%
         purrr::reduce(bind_rows) %>%
         purrr::set_names(c("component", "value")) %>%
         tidyr::drop_na() %>%
-        dplyr::mutate(component = map_chr(component, clean_components)) %>%
+        dplyr::mutate(component = purrr::map_chr(component, clean_components)) %>%
         dplyr::bind_rows(loc_df)
 
       return(CleanData)
@@ -172,14 +172,14 @@ clean_lead_sheets <- function(files = NULL) {
 
   # Apply this cleaning function to all the files in the "files" argument of the main function
   All_clean_files <- purrr::map(files, clean_one_sheet) %>%
-    set_names(leadsheet_names) %>%
-    map2(., names(.), add_test_name)
+    purrr::set_names(leadsheet_names) %>%
+    purrr::map2(., names(.), add_test_name)
 
   # A function to combine the three tables from each leadsheet into three compete tables to hold the data for the
   # complete set of tests
   pluck_and_merge <- function(testdata, element)
   {
-    purrr::map(testdata, function(x) pluck(x, element)) %>%
+    purrr::map(testdata, function(x) purrr::pluck(x, element)) %>%
       purrr::reduce(dplyr::bind_rows)
   }
 
