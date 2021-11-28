@@ -34,6 +34,10 @@ yield_progress_report <- function(yieldfiles = NULL, leadsheetfiles = NULL, yiel
                                  "pubescence"   = "pub",
                                  "seed density" = "seed_density",
                                  "seed quality" = "sq",
-                                 "swell ratio"  = "swell_ratio"))
+                                 "swell ratio"  = "swell_ratio")) %>%
+    tidyr::pivot_wider(id_cols      = test_name,
+                       names_from   = trait,
+                       values_from  = reps_to_measure,
+                       names_prefix = "required_reps")
 
 }
