@@ -15,3 +15,5 @@ yield_lookup <- make_yield_lookup_table(leadsheets_cleaned, Yield_Cleaned)
 # Make the yield nir file using these three data sources
 make_nir_file(leadsheets_cleaned, Yield_Cleaned, yield_lookup)
 
+
+yield_progress_report(yieldfiles = NULL, leadsheetfiles = NULL)
