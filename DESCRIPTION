@@ -23,9 +23,10 @@ Imports:
     stringr,
     purrr,
     janitor, 
-    tools
+    tools, 
+    metan
 Depends: 
-    R (>= 2.10)
+    R (>= 2.10),
     janitor,
     readr,
     tidyselect, 

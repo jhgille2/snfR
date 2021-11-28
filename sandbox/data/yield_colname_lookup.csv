@@ -1,3 +1,5 @@
 oldname,newname
 mat,md
 pc,pub
+pro,protein_dry_basis
+oil,oil_dry_basis

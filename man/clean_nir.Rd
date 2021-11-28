@@ -7,10 +7,10 @@
 clean_nir(files = NULL, sepChar = NULL, codeCols = NULL)
 }
 \arguments{
-\item{files}{A vector of file paths to nir csv export files.
+\item{files}{A vector of file paths to nir csv export files.}
+}
 \value{
-A named list of tibbles.
-}}
+A merged dataframe with all the NIR data from all the files that were used as input.
 }
 \description{
 A function to read in and tidy the nir machine csv output file(s)

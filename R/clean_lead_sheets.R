@@ -140,7 +140,8 @@ clean_lead_sheets <- function(files = NULL) {
         janitor::row_to_names(1) %>%
         janitor::clean_names() %>%
         dplyr::rename(any_of(colname_lookup)) %>%
-        dplyr::mutate(across(everything(), as.character))
+        dplyr::mutate(across(everything(), as.character)) %>%
+        dplyr::filter(!is.na(code))
 
       return(CleanData)
     }

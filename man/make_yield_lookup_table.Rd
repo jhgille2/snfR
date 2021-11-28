@@ -17,7 +17,12 @@ user create a lookup table to map the test names used in the leadsheets to those
 yield files. Oftentimes we use longer names in the field note files for
 each test than in the lead sheets, for example a test may be listed as LU-5E in the leadsheets
 but as LU-5 Early in the yield files. However, to join the data from the leadsheets to the field data, there has
-to be a way to map the names to eachother. This function takes the cleaned leadsheet and yield file data
+to be a way to map the names to each other. This function takes the cleaned leadsheet and yield file data
 and then gives the user an interactive worksheet with the lead sheet test names filled and allows
 the user to enter in their equivalent in the field note files.
+}
+\details{
+To use the interactive editor, first select the appropriate test name for the yield files
+from the dropdown options in the yield file names column, then click on the "sync" button
+with the two circular arrows near the top of the editor, then click the done button.
 }

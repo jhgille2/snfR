@@ -22,9 +22,9 @@ clean_yield_files <- function(files = NULL) {
     # so that they all have the same name for the same trait
     rename_matches <- name_lookups$newname[match(names(names_cleaned), name_lookups$oldname)]
     rename_inds    <- which(!is.na(rename_matches))
-    rename_values  <- rename_matches[[rename_inds]]
+    rename_values  <- rename_matches[rename_inds]
 
-    names(names_cleaned)[[rename_inds]] <- rename_values
+    names(names_cleaned)[rename_inds] <- rename_values
 
     return(names_cleaned)
   }
@@ -53,7 +53,13 @@ clean_yield_files <- function(files = NULL) {
                   "rep",
                   "sdwt",
                   "year",
-                  "yield")
+                  "yield",
+                  "sq",
+                  "protein_dry_basis",
+                  "oil_dry_basis",
+                  "p_o",
+                  "pro_13_percent_m",
+                  "oil_13_percent_m")
 
     yieldfile %>%
       dplyr::mutate(across(any_of(char_cols), as.character)) %>%
