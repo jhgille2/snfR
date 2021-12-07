@@ -3,7 +3,6 @@ Type: Package
 Title: helper functions for data processing and analysis for the Mian soybean breeding group. 
 Version: 0.1.0
 Author: Jay Gillenwater
-Maintainer: jhgille2@ncsu.edu
 Description: This package is a collection of functions that are meant to help with common data processing
     and analysis tasks that come up during our soybean breeding program. Most of the functions help with
     cleaning up data from the files we use for data entry and wrangling them into formats that make downstream analysis
