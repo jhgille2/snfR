@@ -1,8 +1,6 @@
-#' .. content for \description{} (no empty lines) ..
 #'
-#' .. content for \details{} ..
 #'
-#' @title
+#' @title A function to clean NIR export files
 #' @param code_sep_character
 #' @param code_column_names
 #' @param files

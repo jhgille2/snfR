@@ -13,7 +13,14 @@ leadsheets_cleaned <- clean_lead_sheets(All_Leadsheet_files)
 yield_lookup <- make_yield_lookup_table(leadsheets_cleaned, Yield_Cleaned)
 
 # Make the yield nir file using these three data sources
-make_nir_file(leadsheets_cleaned, Yield_Cleaned, yield_lookup)
+nir_2021_yield <- make_nir_file(leadsheets_cleaned, Yield_Cleaned, yield_lookup, nir_startnumber = 6871) %>%
+  rename(Rows = plot,
+         cross = code,
+         color = rep,
+         plant_no = genotype,
+         bar_code = nir_code)
 
 
 yield_progress_report(yieldfiles = NULL, leadsheetfiles = NULL)
+
+

@@ -8,22 +8,6 @@
 #' @param yield_lookup A lookup table used to map the test names used in the leadsheets to the test names
 #' used in the yield files. This should be a dataframe or tibble where the first column holds the test names that
 #' are used in the leadsheets and the second column uses the names that are used in the field note files.
-#' @examples
-#' # The file paths to all the yield field notes
-#' All_Yield_files     <- list.files(here("sandbox", "data", "yieldfiles_2021"), full.names = TRUE)
-#'
-#' # The file paths to all the leadsheet files
-#' All_Leadsheet_files <- list.files(here("sandbox", "data", "leadsheets"), full.names = TRUE)
-#'
-#' # Clean the yield files and the leadsheets
-#' Yield_Cleaned      <- clean_yield_files(All_Yield_files)
-#' leadsheets_cleaned <- clean_lead_sheets(All_Leadsheet_files)
-#'
-#' # Make a lookup table to map leadsheet test names to yield file test names
-#' yield_lookup <- make_yield_lookup_table(leadsheets_cleaned, Yield_Cleaned)
-#'
-#' # Make the yield nir file using these three data sources
-#' make_nir_file(leadsheets_cleaned, Yield_Cleaned, yield_lookup)
 make_nir_file <- function(leadsheet_data = NULL, yield_data = NULL, yield_lookup = NULL, nir_startnumber = 1) {
 
   # Get the number of reps of protein/oil data needed for each test from the lead sheets

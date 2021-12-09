@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_nir_files.R
 \name{clean_nir_files}
 \alias{clean_nir_files}
-\title{}
+\title{A function to clean NIR export files}
 \usage{
 clean_nir_files(
   code_sep_character = NULL,
@@ -11,8 +11,5 @@ clean_nir_files(
 )
 }
 \description{
-.. content for \description{} (no empty lines) ..
-}
-\details{
-.. content for \details{} ..
+A function to clean NIR export files
 }
