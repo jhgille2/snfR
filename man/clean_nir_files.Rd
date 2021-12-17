@@ -10,6 +10,15 @@ clean_nir_files(
   files = NULL
 )
 }
+\arguments{
+\item{code_sep_character}{The character used to separate different data in the id/code that is scanned from the barcode. A barcode like "Ply_N19-0001_2021" would have "_" for this argument}
+
+\item{code_column_names}{The different column names for tha data that make up the id/code. A code like "Ply_N19-0001_2021" would have 'c("loc", "genotype", "year")' for this argument}
+
+\item{files}{File paths to the nir export files to be cleaned/merged}
+}
 \description{
-A function to clean NIR export files
+This function takes all the nir file exports for a given season and extracts/cleans up the measurement data from the exports. In their
+original state, the exports have some header information before the measurements themselves. This function keeps just the measurement data
+and cleans it up to a tidy rectangular dataframe.
 }
