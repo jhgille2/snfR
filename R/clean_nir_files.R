@@ -18,7 +18,7 @@ clean_nir_files <- function(code_sep_character = NULL, code_column_names =
     if(file_type == "csv"){
       file_df <- read.csv(nir_file, header = FALSE)
     }else{
-      file_df <- readxl::read_excel(nir_file, header = FALSE)
+      file_df <- readxl::read_excel(nir_file)
     }
 
     # Find the row in the file where data measurements start,
