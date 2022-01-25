@@ -15,7 +15,7 @@ clean_nir_files <- function(files = NULL, nir_masterfile = NULL) {
   {
     nir_df <- readxl::read_excel(file) %>%
       janitor::clean_names() %>%
-      dplyr::mutate(nir_number_extracted = toupper(str_extract(sample_id, regex("nir-[0-9]+", ignore_case = TRUE)))) %>%
+      dplyr::mutate(nir_number_extracted = toupper(stringr::str_extract(sample_id, regex("nir-[0-9]+", ignore_case = TRUE)))) %>%
       dplyr::select(sample_id, date_time_of_analysis, predicted_moisture_percent, predicted_protein_dry_basis_percent, predicted_oil_dry_basis_percent, nir_number_extracted) %>%
       tidyr::separate(sample_id, into = c("year", "loc", "test", "code", "genotype", "rep", "nir_no"), sep = "_") %>%
       dplyr::mutate(nir_no = nir_number_extracted) %>%
@@ -24,7 +24,7 @@ clean_nir_files <- function(files = NULL, nir_masterfile = NULL) {
                     protein_dry_basis = predicted_protein_dry_basis_percent) %>%
       dplyr::mutate(year = ifelse(str_detect(year, regex("nir", ignore.case = TRUE)), NA, year)) %>%
       dplyr::select(nir_no, date_time_of_analysis, moisture, oil_dry_basis, protein_dry_basis) %>%
-      dplyr::left_join(nir_masterfile, by = c("nir_no" = "NIR_No")) %>%
+      dplyr::left_join(masterfile, by = c("nir_no" = "NIR_No")) %>%
       dplyr::select(test, cross, Rows, color, plant_no, loc, year, moisture, oil_dry_basis, protein_dry_basis) %>%
       dplyr::rename(code = cross, plot = Rows, rep = color, genotype = plant_no)
 
