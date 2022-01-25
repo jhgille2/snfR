@@ -22,7 +22,7 @@ clean_nir_files <- function(files = NULL, nir_masterfile = NULL) {
       dplyr::rename(moisture = predicted_moisture_percent,
                     oil_dry_basis = predicted_oil_dry_basis_percent,
                     protein_dry_basis = predicted_protein_dry_basis_percent) %>%
-      dplyr::mutate(year = ifelse(stringr::str_detect(year, regex("nir", ignore.case = TRUE)), NA, year)) %>%
+      dplyr::mutate(year = ifelse(stringr::str_detect(year, stringr::regex("nir", ignore.case = TRUE)), NA, year)) %>%
       dplyr::select(nir_no, date_time_of_analysis, moisture, oil_dry_basis, protein_dry_basis) %>%
       dplyr::left_join(nir_lookup, by = c("nir_no" = "NIR_No")) %>%
       dplyr::select(test, cross, Rows, color, plant_no, loc, year, moisture, oil_dry_basis, protein_dry_basis) %>%
@@ -33,7 +33,8 @@ clean_nir_files <- function(files = NULL, nir_masterfile = NULL) {
 
   # Apply the cleaning function to each nir export and then bind the results together
   CleanedFiles <- purrr::map(files, clean_nir_export) %>%
-    purrr::reduce(dplyr::bind_rows)
+    purrr::reduce(dplyr::bind_rows) %>%
+    dplyr::distinct()
 
   return(CleanedFiles)
 
