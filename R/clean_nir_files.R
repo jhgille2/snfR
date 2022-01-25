@@ -13,7 +13,13 @@ clean_nir_files <- function(code_sep_character = NULL, code_column_names =
   clean_export_df <- function(nir_file)
   {
     # Read in the file
-    file_df <- read.csv(nir_file, header = FALSE)
+    file_type <- tools::file_ext(nir_file)
+
+    if(file_type == "csv"){
+      file_df <- read.csv(nir_file, header = FALSE)
+    }else{
+      file_df <- readxl::read_excel(nir_file)
+    }
 
     # Find the row in the file where data measurements start,
     # and the last row where the measurements end
@@ -56,7 +62,7 @@ clean_nir_files <- function(code_sep_character = NULL, code_column_names =
   }
 
   # Apply this function to each of the nir files in the "files" argument
-  all_nir_data <- purrr::map(files, clean_export_df) %>%
+  all_nir_data <- purrr::map(files, purrr::safely(clean_export_df)) %>%
     purrr::reduce(dplyr::bind_rows)
 
   return(all_nir_data)
