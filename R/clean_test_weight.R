@@ -34,7 +34,9 @@ clean_test_weight <- function(files = NULL) {
     purrr::reduce(dplyr::bind_rows) %>%
     janitor::clean_names() %>%
     dplyr::select(sample_id, moisture, weight, temperature, date_time) %>%
-    dplyr::rename_at(vars(moisture:date_time), function(x) paste0("twt_", x))
+    dplyr::rename_at(vars(moisture:date_time), function(x) paste0("twt_", x)) %>%
+    tidyr::separate(sample_id, into = c("plot", "genotype", "test", "loc", "year", "rep")) %>%
+    dplyr::select(test, genotype, test, loc, year, rep, twt_mositure, twt_weight, twt_temperature, twt_date_time)
 
   return(all_test_weight_data)
 }
