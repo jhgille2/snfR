@@ -70,7 +70,8 @@ clean_yield_files <- function(files = NULL) {
   All_Yield_Dfs <- purrr::map(files, function(x) readxl::read_excel(x) %>%
                                 rename_yield_dfs(., yield_lookup) %>%
                                 set_yield_coltypes()) %>%
-    purrr::reduce(dplyr::bind_rows)
+    purrr::reduce(dplyr::bind_rows) %>%
+    dplyr::select(-tidyr::num_range("x", 1:999))
 
   return(All_Yield_Dfs)
 }
