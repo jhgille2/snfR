@@ -3,55 +3,35 @@
 #' @title Tidy NIR csv exports into a list of tibbles.
 #' @param files A vector of file paths to nir csv export files.
 #' @return A merged dataframe with all the NIR data from all the files that were used as input.
-clean_nir <- function(files = NULL, sepChar = NULL, codeCols = NULL) {
+clean_nir <- function(files = NULL, nir_masterfile = NULL) {
 
-  # Read in every file from the filepaths in the files argument
-  AllFiles <- purrr::map(files, readr::read_csv, skip = 3)
+  # Read in the nir masterfile
+ masterfile <- read_csv(nir_masterfile)
 
-  # A function to clean an individual file
-  clean_nir_file <- function(nir_df){
+ # A function to read in and clean each nir file from the files argument
+ clean_nir_export <- function(file, masterfile = masterfile)
+ {
+   nir_df <- read_excel(file) %>%
+     janitor::clean_names() %>%
+     dplyr::mutate(nir_number_extracted = toupper(str_extract(sample_id, regex("nir-[0-9]+", ignore_case = TRUE)))) %>%
+     dplyr::select(sample_id, date_time_of_analysis, predicted_moisture_percent, predicted_protein_dry_basis_percent, predicted_oil_dry_basis_percent, nir_number_extracted) %>%
+     tidyr::separate(sample_id, into = c("year", "loc", "test", "code", "genotype", "rep", "nir_no"), sep = "_") %>%
+     dplyr::mutate(nir_no = nir_number_extracted) %>%
+     dplyr::rename(moisture = predicted_moisture_percent,
+                   oil_dry_basis = predicted_oil_dry_basis_percent,
+                   protein_dry_basis = predicted_protein_dry_basis_percent) %>%
+     dplyr::mutate(year = ifelse(str_detect(year, regex("nir", ignore.case = TRUE)), NA, year)) %>%
+     dplyr::select(nir_no, date_time_of_analysis, moisture, oil_dry_basis, protein_dry_basis) %>%
+     dplyr::left_join(nir_masterfile, by = c("nir_no" = "NIR_No")) %>%
+     dplyr::select(test, cross, Rows, color, plant_no, loc, year, moisture, oil_dry_basis, protein_dry_basis) %>%
+     dplyr::rename(code = cross, plot = Rows, rep = color, genotype = plant_no)
 
-    colnames(nir_df)[1:5] <- c("sample_id", "date", "time", "notes", "parameters")
+   return(nir_df)
+ }
 
-    nir_df <- nir_df[-c(1:2, nrow(nir_df)), ]
-
-    # Numeric column names
-    numcols <- c("year",
-                 "code",
-                 "rep",
-                 "moisture",
-                 "protein_dry_basis",
-                 "oil_dry_basis")
-
-    # Character columns
-    charcols <- c("loc",
-                  "test",
-                  "genotype",
-                  "nir_no")
-
-    nir_df_clean <- janitor::clean_names(nir_df) %>%
-      dplyr::select(sample_id, date, time, notes, moisture, protein_dry_basis, oil_dry_basis) %>%
-      tidyr::separate(sample_id, into = c("year",
-                                          "loc",
-                                          "test",
-                                          "code",
-                                          "genotype",
-                                          "rep",
-                                          "nir_no"),
-                      sep = "_",
-                      fill = "left") %>%
-      dplyr::mutate(date_time = lubridate::mdy_hm(paste(date, time))) %>%
-      dplyr::relocate(date_time, .before = "date") %>%
-      dplyr::select(-any_of(c("date", "time"))) %>%
-      dplyr::mutate(across(any_of(numcols), as.numeric),
-                    across(any_of(charcols), as.character),
-                    genotype = stringr::str_squish(genotype))
-
-    return(nir_df_clean)
-  }
-
-  CleanedFiles <- purrr::map(AllFiles, clean_nir_file) %>%
-    purrr::reduce(dplyr::bind_rows)
+ # Apply the cleaning function to each nir export and then bind the results together
+ CleanedFiles <- purrr::map(files, clean_nir_export) %>%
+   purrr::reduce(dplyr::bind_rows)
 
   return(CleanedFiles)
 }

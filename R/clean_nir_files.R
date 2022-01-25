@@ -63,6 +63,7 @@ clean_nir_files <- function(code_sep_character = NULL, code_column_names =
 
   # Apply this function to each of the nir files in the "files" argument
   all_nir_data <- purrr::map(files, purrr::safely(clean_export_df)) %>%
+    purrr::map(., function(x) purrr::pluck(x, "result")) %>%
     purrr::reduce(dplyr::bind_rows)
 
   return(all_nir_data)
