@@ -3,69 +3,38 @@
 #' and cleans it up to a tidy rectangular dataframe.
 #'
 #' @title A function to clean NIR export files
-#' @param code_sep_character The character used to separate different data in the id/code that is scanned from the barcode. A barcode like "Ply_N19-0001_2021" would have "_" for this argument
-#' @param code_column_names The different column names for tha data that make up the id/code. A code like "Ply_N19-0001_2021" would have 'c("loc", "genotype", "year")' for this argument
-#' @param files File paths to the nir export files to be cleaned/merged
-clean_nir_files <- function(code_sep_character = NULL, code_column_names =
-                            NULL, files = NULL) {
+#' @param files A vector of file paths to nir csv export files.
+#' @param nir_masterfile The file path the nir masterfile
+clean_nir_files <- function(files = NULL, nir_masterfile = NULL) {
 
-  # A function to clean a single export df
-  clean_export_df <- function(nir_file)
+  # Read in the nir masterfile
+  masterfile <- readr::read_csv(nir_masterfile)
+
+  # A function to read in and clean each nir file from the files argument
+  clean_nir_export <- function(file, masterfile = masterfile)
   {
-    # Read in the file
-    file_type <- tools::file_ext(nir_file)
+    nir_df <- readxl::read_excel(file) %>%
+      janitor::clean_names() %>%
+      dplyr::mutate(nir_number_extracted = toupper(str_extract(sample_id, regex("nir-[0-9]+", ignore_case = TRUE)))) %>%
+      dplyr::select(sample_id, date_time_of_analysis, predicted_moisture_percent, predicted_protein_dry_basis_percent, predicted_oil_dry_basis_percent, nir_number_extracted) %>%
+      tidyr::separate(sample_id, into = c("year", "loc", "test", "code", "genotype", "rep", "nir_no"), sep = "_") %>%
+      dplyr::mutate(nir_no = nir_number_extracted) %>%
+      dplyr::rename(moisture = predicted_moisture_percent,
+                    oil_dry_basis = predicted_oil_dry_basis_percent,
+                    protein_dry_basis = predicted_protein_dry_basis_percent) %>%
+      dplyr::mutate(year = ifelse(str_detect(year, regex("nir", ignore.case = TRUE)), NA, year)) %>%
+      dplyr::select(nir_no, date_time_of_analysis, moisture, oil_dry_basis, protein_dry_basis) %>%
+      dplyr::left_join(nir_masterfile, by = c("nir_no" = "NIR_No")) %>%
+      dplyr::select(test, cross, Rows, color, plant_no, loc, year, moisture, oil_dry_basis, protein_dry_basis) %>%
+      dplyr::rename(code = cross, plot = Rows, rep = color, genotype = plant_no)
 
-    if(file_type == "csv"){
-      file_df <- read.csv(nir_file, header = FALSE)
-    }else{
-      file_df <- readxl::read_excel(nir_file)
-    }
-
-    # Find the row in the file where data measurements start,
-    # and the last row where the measurements end
-    df_first_col <- file_df[, 1] %>%
-      unlist() %>%
-      as.character()
-
-    measurements_first_row <- which(df_first_col == "Sample ID")
-    measurements_last_row  <- nrow(file_df) - 1
-
-    # Isolate the measurement data from the rest of the worksheet
-    # Also, only take the sumset of the total columns that have ID information and the
-    # protein and oil measurements
-    measurement_data <- file_df[measurements_first_row:measurements_last_row, c(1:4, 6:8)]
-
-    # Set column names for the data and remove the first row that previously
-    # held (some) of the column names
-    colnames(measurement_data) <- c("sample_id",
-                                    "date",
-                                    "time",
-                                    "notes",
-                                    "moisture",
-                                    "protein_dry_basis",
-                                    "oil_dry_basis")
-
-    measurement_data <- measurement_data[-1, ]
-
-
-    clean_measurement_data <- measurement_data %>%
-      dplyr::mutate(date_time = as.POSIXct(paste(date, time), format = "%m/%d/%Y %I:%M %p")) %>%
-      dplyr::select(sample_id,
-                    date_time,
-                    notes,
-                    moisture,
-                    protein_dry_basis,
-                    oil_dry_basis) %>%
-      tidyr::separate(sample_id, into = code_column_names, sep = code_sep_character)
-
-    return(clean_measurement_data)
+    return(nir_df)
   }
 
-  # Apply this function to each of the nir files in the "files" argument
-  all_nir_data <- purrr::map(files, purrr::safely(clean_export_df)) %>%
-    purrr::map(., function(x) purrr::pluck(x, "result")) %>%
+  # Apply the cleaning function to each nir export and then bind the results together
+  CleanedFiles <- purrr::map(files, clean_nir_export) %>%
     purrr::reduce(dplyr::bind_rows)
 
-  return(all_nir_data)
+  return(CleanedFiles)
 
 }
