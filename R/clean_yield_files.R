@@ -42,6 +42,7 @@ clean_yield_files <- function(files = NULL) {
                    "notes",
                    'pub',
                    "test",
+                   "rep",
                    "id",
                    "loc")
 
@@ -50,7 +51,6 @@ clean_yield_files <- function(files = NULL) {
                   "lod",
                   "md",
                   "plot",
-                  "rep",
                   "sdwt",
                   "year",
                   "yield",
