@@ -62,7 +62,7 @@ clean_nir_files <- function(files = NULL, nir_masterfile = NULL, select_FA = FAL
                protein_dry_basis,
                linoleic_acid_dry_basis,
                linolenic_acid_dry_basis,
-               oleic_acid_dry_basist,
+               oleic_acid_dry_basis,
                palmitic_acid_dry_basis,
                stearic_acid_dry_basis)
     }else{
