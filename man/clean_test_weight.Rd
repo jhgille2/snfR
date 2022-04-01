@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_test_weight.R
 \name{clean_test_weight}
 \alias{clean_test_weight}
-\title{}
+\title{A function to clean GAC test weight exports}
 \usage{
 clean_test_weight(files = NULL)
 }
@@ -10,14 +10,9 @@ clean_test_weight(files = NULL)
 \item{files}{Filepaths to the test weight files can be either .csv or .xlsx files}
 }
 \value{
-
+A tibble of cleaned test weight data
 }
 \description{
-.. content for \description{} (no empty lines) ..
-}
-\details{
-.. content for \details{} ..
-}
-\author{
-'Jay
+This function takes exports from the GAC test weight machine and cleans them
+to a tidy tibble format.
 }

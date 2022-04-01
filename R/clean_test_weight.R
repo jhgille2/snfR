@@ -1,12 +1,9 @@
-#' .. content for \description{} (no empty lines) ..
+#' This function takes exports from the GAC test weight machine and cleans them
+#' to a tidy tibble format.
 #'
-#' .. content for \details{} ..
-#'
-#' @title
+#' @title A function to clean GAC test weight exports
 #' @param files Filepaths to the test weight files can be either .csv or .xlsx files
-#' @return
-#' @author 'Jay
-#' @export
+#' @return A tibble of cleaned test weight data
 clean_test_weight <- function(files = NULL) {
 
   # A function to read in the file
