@@ -4,7 +4,7 @@
 \alias{clean_nir}
 \title{Tidy NIR csv exports into a list of tibbles.}
 \usage{
-clean_nir(files = NULL, sepChar = NULL, codeCols = NULL)
+clean_nir(files = NULL, nir_masterfile = NULL)
 }
 \arguments{
 \item{files}{A vector of file paths to nir csv export files.}

@@ -4,18 +4,14 @@
 \alias{clean_nir_files}
 \title{A function to clean NIR export files}
 \usage{
-clean_nir_files(
-  code_sep_character = NULL,
-  code_column_names = NULL,
-  files = NULL
-)
+clean_nir_files(files = NULL, nir_masterfile = NULL, select_FA = FALSE)
 }
 \arguments{
-\item{code_sep_character}{The character used to separate different data in the id/code that is scanned from the barcode. A barcode like "Ply_N19-0001_2021" would have "_" for this argument}
+\item{files}{A vector of file paths to nir csv export files.}
 
-\item{code_column_names}{The different column names for tha data that make up the id/code. A code like "Ply_N19-0001_2021" would have 'c("loc", "genotype", "year")' for this argument}
+\item{nir_masterfile}{The file path the nir masterfile}
 
-\item{files}{File paths to the nir export files to be cleaned/merged}
+\item{select_FA}{Logical, should fatty acid columns be included in the data}
 }
 \description{
 This function takes all the nir file exports for a given season and extracts/cleans up the measurement data from the exports. In their
