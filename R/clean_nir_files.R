@@ -43,18 +43,42 @@ clean_nir_files <- function(files = NULL, nir_masterfile = NULL, select_FA = FAL
     }else{
       nir_df %<>%
         dplyr::select(sample_id, date_time_of_analysis, predicted_moisture_percent, predicted_protein_dry_basis_percent, predicted_oil_dry_basis_percent, nir_number_extracted) %>%
-        tidyr::separate(sample_id, into = c("year", "loc", "test", "code", "genotype", "rep", "nir_no"), sep = "_") %>%
-        dplyr::mutate(nir_no = nir_number_extracted) %>%
         dplyr::rename(moisture = predicted_moisture_percent,
                       oil_dry_basis = predicted_oil_dry_basis_percent,
                       protein_dry_basis = predicted_protein_dry_basis_percent)
     }
 
     nir_df %<>%
-      dplyr::mutate(year = ifelse(stringr::str_detect(year, stringr::regex("nir", ignore.case = TRUE)), NA, year)) %>%
-      dplyr::select(nir_no, date_time_of_analysis, moisture, oil_dry_basis, protein_dry_basis) %>%
+      tidyr::separate(sample_id, into = c("year", "loc", "test", "code", "genotype", "rep", "nir_no"), sep = "_") %>%
+      dplyr::mutate(nir_no = nir_number_extracted) %>%
+      dplyr::mutate(year = ifelse(stringr::str_detect(year, stringr::regex("nir", ignore.case = TRUE)), NA, year))
+
+    if(select_FA){
+      nir_df %<>%
+        select(nir_no,
+               date_time_of_analysis,
+               moisture,
+               oil_dry_basis,
+               protein_dry_basis,
+               linoleic_acid_dry_basis,
+               linolenic_acid_dry_basis,
+               oleic_acid_dry_basist,
+               palmitic_acid_dry_basis,
+               stearic_acid_dry_basis)
+    }else{
+      nir_df %<>%
+        select(nir_no,
+               date_time_of_analysis,
+               moisture,
+               oil_dry_basis,
+               protein_dry_basis)
+    }
+
+    id_cols <- c("test", "cross", "Rows", "color", "plant_no", "loc", "year")
+
+    nir_df %<>%
       dplyr::left_join(nir_lookup, by = c("nir_no" = "NIR_No")) %>%
-      dplyr::select(test, cross, Rows, color, plant_no, loc, year, moisture, oil_dry_basis, protein_dry_basis) %>%
+      dplyr::relocate(any_of(id_cols), .before = moisture) %>%
       dplyr::rename(code = cross, plot = Rows, rep = color, genotype = plant_no)
 
     return(nir_df)
