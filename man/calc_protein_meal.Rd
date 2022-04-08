@@ -2,14 +2,14 @@
 % Please edit documentation in R/calc_protein_meal.R
 \name{calc_protein_meal}
 \alias{calc_protein_meal}
-\title{Calculate protein meal}
+\title{Calculate protein meal.}
 \usage{
 calc_protein_meal(oil_13_percent = NULL, protein_13_percent = NULL)
 }
 \arguments{
-\item{oil_13_percent}{The seed oil content at 13% moisture basis}
+\item{oil_13_percent}{The seed oil content at 13\% moisture basis.}
 
-\item{protein_13_percent}{The seed protein content at 13% moisture basis}
+\item{protein_13_percent}{The seed protein content at 13\% moisture basis.}
 }
 \value{
 Meal protein content
@@ -19,5 +19,5 @@ This function takes the seed protein and seed oil content at a 13% moisture basi
 returns the meal protein content.
 }
 \references{
-Pantalone, V., & Smallwood, C. (2018) Registration of ‘TN11-5102’ soybean cultivar with high yield and high protein meal. Journal of Plant Registrations, 12:304–308
+Pantalone, V., & Smallwood, C. (2018) Registration of 'TN11-5102' soybean cultivar with high yield and high protein meal. Journal of Plant Registrations, 12:304-308
 }
