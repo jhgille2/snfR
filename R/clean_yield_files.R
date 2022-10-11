@@ -63,7 +63,8 @@ clean_yield_files <- function(files = NULL) {
 
     yieldfile %>%
       dplyr::mutate(across(any_of(char_cols), as.character)) %>%
-      dplyr::mutate(across(any_of(num_cols), as.numeric))
+      dplyr::mutate(across(any_of(num_cols), as.numeric)) %>%
+      dplyr::select(any_of(c(char_cols, num_cols)))
   }
 
   # Read in each file, rename the columns, set column types, and merge all the files together
