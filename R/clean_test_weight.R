@@ -14,7 +14,7 @@ clean_test_weight <- function(files = NULL) {
 
     # Read in the file as long as its either a .csv or a excel worksheet
     if(fileext == "csv"){
-      out <- read.csv(file, header = TRUE)
+      out <- read_csv(file, header = TRUE)
     }else if(fileext == "xlsx"){
       out <- readxl::read_excel(file)
     }else{
