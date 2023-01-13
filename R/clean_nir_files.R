@@ -49,7 +49,7 @@ clean_nir_files <- function(files = NULL, nir_masterfile = NULL, select_FA = FAL
     }
 
     nir_df %<>%
-      tidyr::separate(sample_id, into = c("year", "loc", "test", "code", "genotype", "rep", "nir_no"), sep = "_") %>%
+      tidyr::separate(sample_id, into = c("year", "loc", "test", "genotype", "code", "plot", "rep", "nir_no"), sep = "_")  %>%
       dplyr::mutate(nir_no = nir_number_extracted) %>%
       dplyr::mutate(year = ifelse(stringr::str_detect(year, stringr::regex("nir", ignore.case = TRUE)), NA, year))
 
@@ -74,12 +74,11 @@ clean_nir_files <- function(files = NULL, nir_masterfile = NULL, select_FA = FAL
                protein_dry_basis)
     }
 
-    id_cols <- c("test", "cross", "Rows", "color", "plant_no", "loc", "year")
+    id_cols <- c("test", "code", "plot", "rep", "genotype", "loc", "year")
 
     nir_df %<>%
-      dplyr::left_join(nir_lookup, by = c("nir_no" = "NIR_No")) %>%
-      dplyr::relocate(any_of(id_cols), .before = moisture) %>%
-      dplyr::rename(code = cross, plot = Rows, rep = color, genotype = plant_no)
+      dplyr::left_join(nir_lookup, by = c("nir_no" = "nir_number")) %>%
+      dplyr::relocate(any_of(id_cols), .before = moisture)
 
     return(nir_df)
   }
