@@ -9,7 +9,7 @@
 clean_nir_files <- function(files = NULL, nir_masterfile = NULL, select_FA = FALSE) {
 
   # Read in the nir masterfile
-  masterfile <- readr::read_csv(nir_masterfile)
+  # masterfile <- readr::read_csv(nir_masterfile)
 
   # A function to read in and clean each nir file from the files argument
   clean_nir_export <- function(file, nir_lookup = masterfile)
